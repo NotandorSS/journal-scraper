@@ -1,4 +1,5 @@
-threads = [
+from commentClass import User, Tokota, SearchResults
+links = [
 	# 'https://www.deviantart.com/comments/1/511652394/3737628384',
 	# 'https://www.deviantart.com/comments/1/511652394/3737628768',
 	# 'https://www.deviantart.com/comments/1/550318978/3902501094',
@@ -33,11 +34,11 @@ threads = [
 	# 'https://www.deviantart.com/comments/1/601460556/4099607810',
 	# 'https://www.deviantart.com/comments/1/601460556/4099607738',
 	# 'https://www.deviantart.com/comments/1/601460556/4099607482',
-	'https://www.deviantart.com/comments/1/632889004/4217197409',
-	'https://www.deviantart.com/comments/1/632889004/4217197539',
-	'https://www.deviantart.com/comments/1/632889004/4217197629',
-	'https://www.deviantart.com/comments/1/632889004/4217197740',
-	'https://www.deviantart.com/comments/1/638874733/4239359097',
+	# 'https://www.deviantart.com/comments/1/632889004/4217197409',
+	# 'https://www.deviantart.com/comments/1/632889004/4217197539',
+	# 'https://www.deviantart.com/comments/1/632889004/4217197629',
+	# 'https://www.deviantart.com/comments/1/632889004/4217197740',
+	# 'https://www.deviantart.com/comments/1/638874733/4239359097',
 	# 'https://www.deviantart.com/comments/1/638874733/4239359323',
 	# 'https://www.deviantart.com/comments/1/638874733/4239359425',
 	# 'https://www.deviantart.com/comments/1/638874733/4239359525',
@@ -205,7 +206,7 @@ threads = [
 	# 'https://www.deviantart.com/comments/1/836825722/4831328530',
 	# 'https://www.deviantart.com/comments/1/840703824/4840503176',
 	# 'https://www.deviantart.com/comments/1/840703897/4840503472',
-	# 'https://www.deviantart.com/comments/1/840703897/4840503638',
+	'https://www.deviantart.com/comments/1/840703897/4840503638',
 	# 'https://www.deviantart.com/comments/1/840703897/4840503752',
 	# 'https://www.deviantart.com/comments/1/844971849/4849700964',
 	# 'https://www.deviantart.com/comments/1/844971849/4851030676',
@@ -216,14 +217,30 @@ threads = [
 	# 'https://www.deviantart.com/comments/1/844971993/4849700861',
     ]
 
-users = {
-	'secretrealm': ['secret'],
-	'MarbleSplotch': ['Hay'],
-	'demonicrose': ['Jill'],
-    'Keksefuzzy': ['Kex'], 
-    'Shiningstarofwinter': ['Shining'], 
-    'ShiningWinteradopts': ['Shining'], 
-    'Dunrosiel': ['Dun'], 
-    'PaintedHyena': ['Kass'], 
-    'hyenacrowley': ['Kass'],
-}
+userList = [
+	User('secret', [
+		SearchResults('secretrealm'),
+		# Tokota('Starry Midwinter Night 39680', 'https://tokotna.com/imports/index.php?id=39680', '-792550233', 'http://fav.me/dd3v3o9')
+	]),
+	User('Hay', [
+		SearchResults('MarbleSplotch'),
+		Tokota('Kouma 31770', 'https://tokotna.com/imports/index.php?id=31770', '-711652754', 'http://fav.me/dbrp6s2')
+	]),
+	User('Jill', [
+		SearchResults('demonicrose'),
+	]),
+	User('Kex', [
+		SearchResults('Keksefuzzy'),
+	]),
+	User('Shining', [
+		SearchResults('Shiningstarofwinter'),
+		SearchResults('ShiningWinteradopts'),
+	]),
+	User('Dun', [
+		SearchResults('Dunrosiel'),
+	]),
+	User('Kass', [
+		SearchResults('PaintedHyena'),
+		SearchResults('hyenacrowley')
+	])
+]
