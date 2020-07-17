@@ -1,50 +1,77 @@
 import xlsxwriter
-from commentClass import User, Tokota, SearchResults
+from commentClass import User, Tokota, SearchResults, Link
+from enum import Enum, IntEnum
 
 def writeToXlsx(userList):
     workbook = xlsxwriter.Workbook('TokoTime.xlsx')
     for user in userList:
         currentWorksheet = workbook.add_worksheet(user.id)
-
-        colCommentedCounter = 0
-        colMentionedCounter = 0
-        colUsedCounter = 0
+        rowCounters = [0] * 18
         
-        colCommentedCounter = __writeToWorkbook(currentWorksheet, colCommentedCounter, 0, "Commented")
-        colMentionedCounter = __writeToWorkbook(currentWorksheet, colMentionedCounter, 1, "Mentioned")
-        colUsedCounter = __writeToWorkbook(currentWorksheet, colUsedCounter, 2, "Used")
-
+        __writeToWorkbook(currentWorksheet, rowCounters, 0, "Breeding (commented)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 1, "Breeding (mentioned)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 2, "Breeding (used)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 3, "Ownership (commented)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 4, "Ownership (mentioned)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 5, "Ownership (used)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 6, "Corrections (commented)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 7, "Corrections (mentioned)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 8, "Corrections (used)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 9, "Abandoned (commented)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 10, "Abandoned (mentioned)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 11, "Abandoned (used)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 12, "Tokotines (commented)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 13, "Tokotines (mentioned)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 14, "Tokotines (used)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 15, "Misc (commented)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 16, "Misc (mentioned)")
+        __writeToWorkbook(currentWorksheet, rowCounters, 17, "Misc (used)")
         for search in user.searches:
-            maxCounter = max([colCommentedCounter, colMentionedCounter, colUsedCounter])
+            maxCounter = max(rowCounters)
+            for x in range(1, 18):
+                rowCounters[x] = maxCounter+1
+
             if isinstance(search, SearchResults):
-                colCommentedCounter = __writeToWorkbook(currentWorksheet, maxCounter, 0, search.searchString)
-                colMentionedCounter = colCommentedCounter
-                colUsedCounter = colCommentedCounter
+                currentWorksheet.write(maxCounter, 0, search.searchString)
+                rowCounters[0] += 1
+
                 for link in search.commented:
-                    colCommentedCounter = __writeToWorkbook(currentWorksheet, colCommentedCounter, 0, link)
+                    column = int(ThreadType[link.origin])
+                    __writeToWorkbook(currentWorksheet, rowCounters, column, link.html)
+
                 for link in search.mentionedIn:
-                    colMentionedCounter = __writeToWorkbook(currentWorksheet, colMentionedCounter, 1, link)
+                    column = int(ThreadType[link.origin]) + 1
+                    __writeToWorkbook(currentWorksheet, rowCounters, column, link.html)
+
                 for link in search.used:
-                    colUsedCounter = __writeToWorkbook(currentWorksheet, colUsedCounter, 2, link)
+                    column = int(ThreadType[link.origin]) + 2
+                    __writeToWorkbook(currentWorksheet, rowCounters, column, link.html)
+
             elif isinstance(search, Tokota):
-                colCommentedCounter = __writeToWorkbook(currentWorksheet, maxCounter, 0 , search.nameId)
-                colMentionedCounter = colCommentedCounter
-                colUsedCounter = colCommentedCounter
-                for link in search.tokotnaId.mentionedIn:
-                    colMentionedCounter = __writeToWorkbook(currentWorksheet, colMentionedCounter, 1, link)
-                for link in search.tokotnaId.used:
-                    colUsedCounter = __writeToWorkbook(currentWorksheet, colUsedCounter, 2, link)
-                for link in search.deviationId.mentionedIn:
-                    colMentionedCounter = __writeToWorkbook(currentWorksheet, colMentionedCounter, 1, link)
-                for link in search.deviationId.used:
-                    colUsedCounter = __writeToWorkbook(currentWorksheet, colUsedCounter, 2, link)
-                for link in search.favMeLink.mentionedIn:
-                    colMentionedCounter = __writeToWorkbook(currentWorksheet, colMentionedCounter, 1, link)
-                for link in search.favMeLink.used:
-                    colUsedCounter = __writeToWorkbook(currentWorksheet, colUsedCounter, 2, link)
+                currentWorksheet.write(maxCounter, 0, search.nameId)
+                rowCounters[0] += 1
+
+                mentioned = list(set(sum([search.tokotnaId.mentionedIn, search.deviationId.mentionedIn, search.favMeLink.mentionedIn], [])))
+                used = list(set(sum([search.tokotnaId.used, search.deviationId.used, search.favMeLink.used], [])))
+
+                for link in mentioned:
+                    column = int(ThreadType[link.origin]) + 1
+                    __writeToWorkbook(currentWorksheet, rowCounters, column, link.html)
+
+                for link in used:
+                    column = int(ThreadType[link.origin]) + 2
+                    __writeToWorkbook(currentWorksheet, rowCounters, column, link.html)
     workbook.close()
 
-def __writeToWorkbook(worksheet, row, column, value):
-    worksheet.write(row, column, value)
-    row += 1
-    return row
+def __writeToWorkbook(worksheet, rowCounter, column, value):
+    worksheet.write(rowCounter[column], column, value)
+    rowCounter[column] += 1
+    print('\t\trow: ', rowCounter[column])
+
+class ThreadType(IntEnum):
+    breeding = 0
+    ownership = 3
+    corrections = 6
+    abandoned = 9
+    tokotines = 12
+    misc = 15
