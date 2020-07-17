@@ -1,6 +1,6 @@
 class Tokota:
     def __init__(self, nameId_in, tokotna, deviation, favMe):
-        self.nameId = nameId_in
+        self.searchString = nameId_in
         self.tokotnaId = SearchResults(tokotna)
         self.deviationId = SearchResults(deviation)
         self.favMeLink = SearchResults(favMe)

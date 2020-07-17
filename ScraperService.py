@@ -41,9 +41,3 @@ def scrapeThread(links, searchRequests):
             if not threadSegment['hasMore']:
                 break
     return []
-
-
-        
-
-
-    

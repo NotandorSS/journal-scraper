@@ -1,6 +1,6 @@
 import xlsxwriter
 from commentClass import User, Tokota, SearchResults, Link
-from enum import Enum, IntEnum
+from enum import IntEnum
 
 def writeToXlsx(userList):
     workbook = xlsxwriter.Workbook('TokoTime.xlsx')
@@ -26,15 +26,15 @@ def writeToXlsx(userList):
         __writeToWorkbook(currentWorksheet, rowCounters, 15, "Misc (commented)")
         __writeToWorkbook(currentWorksheet, rowCounters, 16, "Misc (mentioned)")
         __writeToWorkbook(currentWorksheet, rowCounters, 17, "Misc (used)")
+        currentWorksheet.freeze_panes(1, 0)
         for search in user.searches:
             maxCounter = max(rowCounters)
             for x in range(1, 18):
                 rowCounters[x] = maxCounter+1
+            currentWorksheet.write(maxCounter, 0, search.searchString)
+            rowCounters[0] += 1
 
             if isinstance(search, SearchResults):
-                currentWorksheet.write(maxCounter, 0, search.searchString)
-                rowCounters[0] += 1
-
                 for link in search.commented:
                     column = int(ThreadType[link.origin])
                     __writeToWorkbook(currentWorksheet, rowCounters, column, link.html)
@@ -46,14 +46,16 @@ def writeToXlsx(userList):
                 for link in search.used:
                     column = int(ThreadType[link.origin]) + 2
                     __writeToWorkbook(currentWorksheet, rowCounters, column, link.html)
-
+                pass
             elif isinstance(search, Tokota):
-                currentWorksheet.write(maxCounter, 0, search.nameId)
-                rowCounters[0] += 1
-
+                commented = list(set(sum([search.tokotnaId.commented, search.deviationId.commented, search.favMeLink.commented], [])))
                 mentioned = list(set(sum([search.tokotnaId.mentionedIn, search.deviationId.mentionedIn, search.favMeLink.mentionedIn], [])))
                 used = list(set(sum([search.tokotnaId.used, search.deviationId.used, search.favMeLink.used], [])))
 
+                for link in commented:
+                    column = int(ThreadType[link.origin])
+                    __writeToWorkbook(currentWorksheet, rowCounters, column, link.html)
+                
                 for link in mentioned:
                     column = int(ThreadType[link.origin]) + 1
                     __writeToWorkbook(currentWorksheet, rowCounters, column, link.html)
@@ -61,12 +63,12 @@ def writeToXlsx(userList):
                 for link in used:
                     column = int(ThreadType[link.origin]) + 2
                     __writeToWorkbook(currentWorksheet, rowCounters, column, link.html)
+                pass
     workbook.close()
 
 def __writeToWorkbook(worksheet, rowCounter, column, value):
     worksheet.write(rowCounter[column], column, value)
     rowCounter[column] += 1
-    print('\t\trow: ', rowCounter[column])
 
 class ThreadType(IntEnum):
     breeding = 0
